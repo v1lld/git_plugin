@@ -127,6 +127,19 @@ writing manifest file 'netbox_access_lists.egg-info/SOURCES.txt'
 running build_ext
 ```
 
+Если вы видите это:
+
+```bash
+django.core.exceptions.ImproperlyConfigured: Unable to import plugin netbox_access_list: Module not found. Check that the plugin module has been installed within the correct Python environment.
+```
+
+Используйте 
+
+```bash
+sudo /opt/netbox/venv/bin/python3 -m pip install -e [path]
+```
+путь, по которому вы извлекли плагин, вместо [path].
+
 ### Настройка NetBox
 
 Наконец, нам нужно настроить NetBox для включения нашего нового плагина. В пути установки NetBox откройте `netbox/netbox/configuration.py` и найдите параметр `PLUGINS`; это должен быть пустой список. (Если он еще не определен, создайте его.) Добавьте имя нашего плагина в этот список:

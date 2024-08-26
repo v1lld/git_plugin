@@ -247,34 +247,10 @@ blank=True
 )
 ```
 
-### Добавление методов цвета выбора
-
-Теперь, когда мы определили варианты выбора для некоторых полей нашей модели, нам нужно будет предоставить метод для возврата соответствующего цвета для выбранного варианта выбора. Это работает аналогично методам `get_FOO_display()` Django, но возвращает цвет (определенный в `ChoiceSet` поля), а не метку. Этот метод будет вызываться, например, при отображении поля в таблице.
-
-Давайте добавим метод `get_default_action_color()` в `AccessList`:
-
-```python
-class AccessList(NetBoxModel):
-# ...
-def get_default_action_color(self):
-return ActionChoices.colors.get(self.default_action)
-```
-
-Нам также нужно добавить методы для `protocol` и `action` в `AccessListRule`:
-
-```python
-class AccessListRule(NetBoxModel):
-# ...
-def get_protocol_color(self):
-return ProtocolChoices.colors.get(self.protocol)
-
-def get_action_color(self):
-return ActionChoices.colors.get(self.action)
-```
 
 ## Создание миграций схемы
 
-Теперь, когда у нас определены модели, нам нужно сгенерировать схему для базы данных PostgreSQL. Хотя таблицы и ограничения можно создавать вручную, гораздо проще использовать [функцию миграции] Django (https://docs.djangoproject.com/en/4.0/topics/migrations/). Она проверит наши классы модели и автоматически сгенерирует необходимые файлы миграции. Это двухэтапный процесс: сначала мы генерируем файл миграции с помощью команды управления `makemigrations`, затем запускаем `migrate`, чтобы применить его к рабочей базе данных.
+Теперь, когда у нас определены модели, нам нужно сгенерировать схему для базы данных PostgreSQL. Хотя таблицы и ограничения можно создавать вручную, гораздо проще использовать [функцию миграции](https://docs.djangoproject.com/en/4.0/topics/migrations/) Django. Она проверит наши классы модели и автоматически сгенерирует необходимые файлы миграции. Это двухэтапный процесс: сначала мы генерируем файл миграции с помощью команды управления `makemigrations`, затем запускаем `migrate`, чтобы применить его к рабочей базе данных.
 
 :warning: **Предупреждение:** Перед продолжением проверьте, что вы установили `DEVELOPER=True` в файле `configuration.py` NetBox. Это необходимо для отключения защиты, призванной не допустить ошибочного создания новых миграций.
 
@@ -284,20 +260,20 @@ return ActionChoices.colors.get(self.action)
 
 ```bash
 $ python netbox/manage.py makemigrations netbox_access_lists --dry-run
-Миграции для 'netbox_access_lists':
-~/netbox-plugin-demo/netbox_access_lists/migrations/0001_initial.py
-- Создать модель AccessList
-- Создать модель AccessListRule
+Migrations for 'netbox_access_lists':
+  ~/netbox-plugin-demo/netbox_access_lists/migrations/0001_initial.py
+    - Create model AccessList
+    - Create model AccessListRule
 ```
 
 Мы должны увидеть план создания первого файла миграции нашего плагина, `0001_initial.py`, с двумя моделями, которые мы определили в `models.py`. (Если на этом этапе вы столкнулись с ошибкой или не видите вывод выше, **остановитесь здесь** и проверьте свою работу.) Если все выглядит хорошо, продолжайте создавать файл миграции (опуская аргумент `--dry-run`):
 
 ```bash
 $ python netbox/manage.py makemigrations netbox_access_lists
-Миграции для 'netbox_access_lists':
-~/netbox-plugin-demo/netbox_access_lists/migrations/0001_initial.py
-- Создать модель AccessList
-- Создать модель AccessListRule
+Migrations for 'netbox_access_lists':
+  ~/netbox-plugin-demo/netbox_access_lists/migrations/0001_initial.py
+    - Create model AccessList
+    - Create model AccessListRule
 ```
 
 Вернувшись в рабочую область плагина, вы должны увидеть каталог `migrations` с двумя файлами: `__init__.py` и `0001_initial.py`.
@@ -318,10 +294,10 @@ $ tree
 
 ```bash
 $ python netbox/manage.py migrate
-Операции для выполнения:
-Применить все миграции: admin, auth, circuits, contenttypes, dcim, django_rq, extras, ipam, netbox_access_lists, sessions, social_django, taggit, tenancy, users, virtualization, wireless
-Выполнение миграций:
-Применение netbox_access_lists.0001_initial... OK
+Operations to perform:
+  Apply all migrations: admin, auth, circuits, contenttypes, dcim, django_rq, extras, ipam, netbox_access_lists, sessions, social_django, taggit, tenancy, users, virtualization, wireless
+Running migrations:
+  Applying netbox_access_lists.0001_initial... OK
 ```
 
 Если вам интересно, вы можете проверить недавно созданные таблицы базы данных, используя команду управления `dbshell` для входа в оболочку PostgreSQL:
@@ -329,26 +305,24 @@ $ python netbox/manage.py migrate
 ```bash
 $ python netbox/manage.py dbshell
 psql (10.19 (Ubuntu 10.19-0ubuntu0.18.04.1))
-SSL-подключение (протокол: TLSv1.3, шифр: TLS_AES_256_GCM_SHA384, биты: 256, сжатие: выключено)
-Введите "help" для справки.
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
+Type "help" for help.
 
 netbox=> \d netbox_access_lists_accesslist
-Таблица "public.netbox_access_lists_accesslist"
-Столбец | Тип | Сортировка | Допускается значение NULL | Default
--------------------+--------------------------+-----------+-----------+-----------------------------------------------------------
-id | bigint | | not null | nextval('netbox_access_lists_accesslist_id_seq'::regclass)
-created | timestamp with timezone | | |
-last_updated | timestamp with timezone | | |
-custom_field_data | jsonb | | | not null |
-name | character variation(100) | | not null |
-default_action | character variation(30) | | not null |
-comments | text | | not null |
-Индексы:
-
-"netbox_access_lists_accesslist_pkey" ПЕРВИЧНЫЙ КЛЮЧ, btree (id)
-Ссылается:
-
-ТАБЛИЦА "netbox_access_lists_accesslistrule" ОГРАНИЧЕНИЕ "netbox_access_lists__access_list_id_6c1b0317_fk_netbox_ac" ВНЕШНИЙ КЛЮЧ (access_list_id) ССЫЛКИ netbox_access_lists_accesslist(id) ОТЛОЖЕННЫЙ ИЗНАЧАЛЬНО ОТЛОЖЕННЫЙ
+                                          Table "public.netbox_access_lists_accesslist"
+      Column       |           Type           | Collation | Nullable |                          Default                           
+-------------------+--------------------------+-----------+----------+------------------------------------------------------------
+ id                | bigint                   |           | not null | nextval('netbox_access_lists_accesslist_id_seq'::regclass)
+ created           | timestamp with time zone |           |          | 
+ last_updated      | timestamp with time zone |           |          | 
+ custom_field_data | jsonb                    |           | not null | 
+ name              | character varying(100)   |           | not null | 
+ default_action    | character varying(30)    |           | not null | 
+ comments          | text                     |           | not null | 
+Indexes:
+    "netbox_access_lists_accesslist_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "netbox_access_lists_accesslistrule" CONSTRAINT "netbox_access_lists__access_list_id_6c1b0317_fk_netbox_ac" FOREIGN KEY (access_list_id) REFERENCES netbox_access_lists_accesslist(id) DEFERRABLE INITIALLY DEFERRED
 ```
 
 Введите `\q`, чтобы выйти из `dbshell`.
@@ -359,9 +333,9 @@ comments | text | | not null |
 
 ```bash
 $ python netbox/manage.py nbshell
-из netbox### Интерактивная оболочка NetBox
+from netbox### NetBox interactive shell
 ### Python 3.8.12 | Django 4.0.3 | NetBox 3.2.0
-### lsmodels() покажет доступные модели. Используйте help(<model>) для получения дополнительной информации.
+### lsmodels() will show available models. Use help(<model>) for more info.
 >>>
 ```
 

@@ -20,12 +20,12 @@
 
 ```bash
 $ git clone --branch step00-empty https://github.com/netbox-community/netbox-plugin-demo
-Клонирование в 'netbox-plugin-demo'...
-remote: Перечисление объектов: 58, выполнено.
-remote: Подсчет объектов: 100% (58/58), выполнено.
-удаленный: Сжатие объектов: 100% (42/42), выполнено.
-удаленный: Всего 58 (дельта 12), повторно использовано 58 (дельта 12), повторно использовано 0
-Распаковка объектов: 100% (58/58), выполнено.
+Cloning into 'netbox-plugin-demo'...
+remote: Enumerating objects: 58, done.
+remote: Counting objects: 100% (58/58), done.
+remote: Compressing objects: 100% (42/42), done.
+remote: Total 58 (delta 12), reused 58 (delta 12), pack-reused 0
+Unpacking objects: 100% (58/58), done.
 ```
 
 :blue_square: **Примечание:** Клонирование демонстрационного репозитория не является строго обязательным, но это позволит вам удобно проверять снимки кода по мере прохождения уроков и преодолевать любые сбои.
@@ -44,7 +44,7 @@ $ touch netbox_access_lists/__init__.py
 Далее откройте `__init__.py` в текстовом редакторе по вашему выбору и импортируйте класс `PluginConfig` из NetBox в верхней части файла.
 
 ```python
-from extras.plugins import PluginConfig
+from netbox.plugins import PluginConfig
 ```
 
 ### Создайте класс PluginConfig
@@ -92,7 +92,7 @@ from setuptools import find_packages, setup
 setup(
 name='netbox-access-lists',
 version='0.1',
-description='Пример плагина NetBox',
+description='An example NetBox plugin',
 install_requires=[],
 packages=find_packages(),
 include_package_data=True,

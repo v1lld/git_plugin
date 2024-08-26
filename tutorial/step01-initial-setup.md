@@ -75,7 +75,7 @@ config = NetBoxAccessListsConfig
 ```markdown
 ## netbox-access-lists
 
-Управление простыми списками контроля доступа в NetBox
+Manage simple access control lists in NetBox
 ```
 
 :green_circle: **Совет:** Вы заметите, что мы дали нашему файлу `README` расширение `md`. Это сообщает инструментам, которые его поддерживают, о необходимости отображать файл как Markdown для лучшей читаемости.

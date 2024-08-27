@@ -97,6 +97,6 @@ Indexing models
 
 <div align="center">
 
-:arrow_left: [Шаг 10: API GraphQL](/tutorial/step10-graphql-api.md)
+
 
 </div>
